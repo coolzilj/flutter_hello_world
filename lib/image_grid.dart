@@ -41,10 +41,10 @@ class ImageGrid extends StatelessWidget {
           new Text("正在展示的图片"),
           new Center(
             child: new ConstrainedBox(
-              constraints: new BoxConstraints.expand(height: 100.0),
+              constraints: new BoxConstraints.expand(height: 300.0),
               child: new CachedNetworkImage(
                 imageUrl:
-                    "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1527746650&di=452fe7d5e465170bc301de2cc0c1f2e5&imgtype=jpg&er=1&src=http%3A%2F%2Fimg5q.duitang.com%2Fuploads%2Fitem%2F201410%2F11%2F20141011234806_aj3Ns.jpeg",
+                    "http://img5.iqilu.com/c/u/2013/0313/1363136852136.jpg",
                 placeholder: new CircularProgressIndicator(),
                 errorWidget: new Icon(Icons.error),
               ),
