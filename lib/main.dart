@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Welcome to Flutter',
       theme: new ThemeData(
-        primaryColor: Colors.green,
+        primaryColor: Colors.white,
       ),
       routes: {
         "/": (_) => new HomePage(),
@@ -48,13 +48,13 @@ class _HomePageState extends State<HomePage> {
                   }),
               new Divider(),
               new RaisedButton(
-                  child: new Text("名字生成器"),
+                  child: new Text("名字生成"),
                   onPressed: () {
                     Navigator.of(context).pushNamed("/random");
                   }),
               new Divider(),
               new RaisedButton(
-                  child: new Text("图片例子"),
+                  child: new Text("图片缓存"),
                   onPressed: () {
                     Navigator.of(context).pushNamed("/images");
                   })

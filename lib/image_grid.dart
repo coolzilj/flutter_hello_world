@@ -11,15 +11,6 @@ class ImageGrid extends StatelessWidget {
   @override
   StatelessElement createElement() {
     CacheManager.showDebugLogs = true;
-//    CacheManager.getInstance().then((cache) {
-//      cache
-//          .getFile(
-//              "http://d.hiphotos.baidu.com/baike/pic/item/1f178a82b9014a902df55272a1773912b21bee32.jpg")
-//          .then((file) {
-//        print(file.path);
-//      });
-//    });
-
     return super.createElement();
   }
 
@@ -27,68 +18,89 @@ class ImageGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        title: new Text("图片例子"),
+        title: new Text("图片缓存"),
       ),
       body: buildBody(),
     );
   }
 
   Widget buildBody() {
-    return new Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new Column(
+    Widget cacheImagesSection = new Expanded(
+      child: new FutureBuilder(
+        future: _getImages(),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return new CircularProgressIndicator();
+            default:
+              if (snapshot.data != null) {
+                print(snapshot.data);
+                return new GridView.count(
+                  crossAxisCount: 2,
+                  // 如果为false，则出现 Vertical viewport was given unbounded height
+                  // 如果未true，则当图片多了会出现问题，这时候需要用到 Expanded（多了可以滚动）
+                  // shrinkWrap: true,
+                  children: snapshot.data.map<Widget>((entity) {
+                    return new Card(
+                        child: new Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        AspectRatio(
+                          aspectRatio: 18 / 11,
+                          child: Image.file(
+                            new File(entity.path),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        new Expanded(
+                          child: new Padding(
+                            padding: EdgeInsets.all(9.0),
+                            child: new Text(
+                              entity.path,
+                              style: new TextStyle(fontSize: 10.0),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ));
+                  }).toList(),
+                );
+              } else {
+                return new Container();
+              }
+          }
+        },
+      ),
+    );
+
+    return new Stack(children: <Widget>[
+      new Column(
         children: <Widget>[
-          new Text("正在展示的图片"),
-          new Center(
-            child: new ConstrainedBox(
-              constraints: new BoxConstraints.expand(height: 300.0),
-              child: new CachedNetworkImage(
-                imageUrl:
-                    "http://img5.iqilu.com/c/u/2013/0313/1363136852136.jpg",
-                placeholder: new CircularProgressIndicator(),
-                errorWidget: new Icon(Icons.error),
-              ),
-            ),
+          new CachedNetworkImage(
+            imageUrl:
+                "https://images.unsplash.com/photo-1511789421096-2b3be5f1f623?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8e2f9b6ddc7b729ef90fde26207e2f26&auto=format&fit=crop&w=1349&q=80",
+            placeholder: new CircularProgressIndicator(),
+            errorWidget: new Icon(Icons.error),
+            width: double.infinity,
+            height: 200.0,
+            fit: BoxFit.cover,
           ),
-          new Text("缓存图片"),
-          new Expanded(
-            child: new FutureBuilder(
-              future: _getImages(),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                    return new Text('Press button to start');
-                  case ConnectionState.waiting:
-                    return new Text('Awaiting result...');
-                  default:
-                    if (snapshot.data != null) {
-                      print("not null");
-                      print(snapshot.data);
-                      return new GridView.count(
-                        crossAxisCount: 2,
-                        childAspectRatio: 1.0,
-                        padding: EdgeInsets.all(8.0),
-                        mainAxisSpacing: 8.0,
-                        // 如果为false，则出现 Vertical viewport was given unbounded height
-                        // 如果未true，则当图片多了会出现问题，这时候需要用到 Expanded（多了可以滚动）
-                        // shrinkWrap: false,
-                        children: snapshot.data.map<Widget>((entity) {
-                          return new GridTile(
-                            child: new Image.file(new File(entity.path)),
-                          );
-                        }).toList(),
-                      );
-                    } else {
-                      print("null");
-                      return new Container();
-                    }
-                }
-              },
+          cacheImagesSection,
+        ],
+      ),
+      new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new FractionalTranslation(
+            translation: const Offset(0.0, 1.0),
+            child: new FloatingActionButton(
+              onPressed: () {},
+              child: new Text("缓存"),
             ),
           )
         ],
-      ),
-    );
+      )
+    ]);
   }
 
   Future<List<FileSystemEntity>> _getImages() async {
